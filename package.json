@@ -1,0 +1,26 @@
+{
+  "name": "rocket_elevators_express",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ManojKumarMuthu/Rocket_Elevators_Express.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ManojKumarMuthu/Rocket_Elevators_Express/issues"
+  },
+  "homepage": "https://github.com/ManojKumarMuthu/Rocket_Elevators_Express#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
