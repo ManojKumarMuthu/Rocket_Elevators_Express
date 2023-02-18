@@ -1,29 +1,38 @@
 const express = require('express')
 const app = express()
 
-require("dotenv").config();
+const {validateRequest} = require('./calculation')
+
+require('dotenv').config();
 const port = process.env.PORT
 
 app.listen(port, () => {
   console.log(` server listening on port ${port} `)
 })
 
+// Hello //
 
 app.get('/hello', (req, res) => {
   console.log(`Server listening on port ${port}`);
   res.send('Hello World!');
 });
 
+// Status //
+
 app.get('/status', (req, res) => {
   const { PORT, ENVIRONMENT } = process.env;
   res.send(`Server is running on port ${PORT} in ${ENVIRONMENT} environment`);
 });
+
+// Error //
 
 app.get('/error', (req, res) => {
   const errorCode = 500;
   const errorMessage = 'This is a simulated error message.';
   res.status(errorCode).json({ error: errorMessage });
 });
+
+// Email-List //
 
 const agents = require('./agents');
 
@@ -32,6 +41,7 @@ app.get('/email-list', (req, res) => {
   res.send(emailList);
 });
 
+// Agent ratings // 
 
 app.get('/region-avg', (req, res) => {
   const region = req.query.region.toLowerCase();
@@ -52,23 +62,23 @@ app.get('/region-avg', (req, res) => {
   }
 });
 
+// Residental Calculation //
 
-
-function validateRequest(req, res, next) {
+app.get('/calculate-elevators', (req, res) => {
   const tier = req.query.tier;
-  const numApts = req.query.numApts;
-  const numFloors = req.query.numFloors;
+  const floors = req.query.floors;
+  const app = req.query.appartments;
 
   if (!tier || !["standard", "premium", "excelium"].includes(tier)) {
     return res.status(400).json({ message: "Invalid tier" });
   }
 
-  if (isNaN(numApts) || isNaN(numFloors)) {
+  if (isNaN(app) || isNaN(floors)) {
     return res.status(400).json({ message: "Apartments and floors must be numbers" });
   }
 
-  const numAptsInt = parseInt(numApts);
-  const numFloorsInt = parseInt(numFloors);
+  const numAptsInt = parseInt(app);
+  const numFloorsInt = parseInt(floors);
 
   if (!Number.isInteger(numAptsInt) || !Number.isInteger(numFloorsInt)) {
     return res.status(400).json({ message: "Apartments and floors must be integers" });
@@ -78,47 +88,16 @@ function validateRequest(req, res, next) {
     return res.status(400).json({ message: "Apartments and floors must be greater than zero" });
   }
 
-  req.numApts = numAptsInt;
-  req.numFloors = numFloorsInt;
-  req.tier = tier;
+  res.send(validateRequest(tier, numFloorsInt, numAptsInt));
+});
 
-  next();
-}
 
-app.get('/calculate-elevators', validateRequest, (req, res) => {
-  const numApts = req.numApts;
-  const numFloors = req.numFloors;
-  const tier = req.tier;
+// Post request//
 
-  const unitPrices = {
-    standard: 8000,
-    premium: 12000,
-    excelium: 15000,
-  };
-  const installPercentFees = {
-    standard: 10,
-    premium: 15,
-    excelium: 20,
-  };
+app.use(express.json());
 
-  let elevatorsRequired;
-
-  if (tier === "standard") {
-    elevatorsRequired = Math.ceil(numApts / numFloors / 6) * Math.ceil(numFloors / 20);
-  } else if (tier === "premium") {
-    elevatorsRequired = Math.ceil(numApts / numFloors / 6) * Math.ceil(numFloors / 20);
-  } else if (tier === "excelium") {
-    elevatorsRequired = Math.ceil(numApts / numFloors / 6) * Math.ceil(numFloors / 20);
-  }
-
-  const elevatorCost = elevatorsRequired * unitPrices[tier];
-  const installationFee = elevatorCost * installPercentFees[tier] / 100;
-  const totalCost = elevatorCost + installationFee;
-
-  res.json({
-    elevatorsRequired,
-    elevatorCost,
-    installationFee,
-    totalCost
-  });
+app.post('/contact-us', (req, res) => {
+  const { first_name, last_name, message } = req.body;
+  console.log(`Received a message from ${first_name} ${last_name}: ${message}`);
+  res.status(200).send(`Thank you for your message, ${first_name}! We have received it and will get back to you soon.`);
 });
