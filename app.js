@@ -99,5 +99,5 @@ app.use(express.json());
 app.post('/contact-us', (req, res) => {
   const { first_name, last_name, message } = req.body;
   console.log(`Received a message from ${first_name} ${last_name}: ${message}`);
-  res.status(200).send(`Thank you for your message, ${first_name}! We have received it and will get back to you soon.`);
+  res.status(200).send(`Thank you for your message, ${first_name} ${last_name}! We have received it and will get back to you soon.`);
 });
